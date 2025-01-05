@@ -24,6 +24,6 @@ object Logger {
 
     private fun log(message: String, level: LogLevel = LogLevel.INFO) {
         val timestamp = LocalDateTime.now()
-        println("\${level.color}[\$timestamp] [\${level.name}] \$message\$ ${Color.RESET}")
+        println("${level.color}[$timestamp] [${level.name}] $message ${Color.RESET}")
     }
 }

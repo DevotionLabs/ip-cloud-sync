@@ -20,13 +20,15 @@ class HttpClient(
 
     private fun handleResponse(response: Response): String {
         response.use {
+            val body = it.body?.string()
+
             if (!it.isSuccessful) {
-                throw IOException("Unexpected code \${it.code}")
+                throw IOException("Unexpected code ${it.code} $body")
             }
-            return it.body?.string() ?: throw IOException("Response body is empty")
+
+            return body ?: throw IOException("Response body is empty")
         }
     }
-
 
     private fun buildUrl(endpoint: String): String {
         return "${protocol}${server}${endpoint}"

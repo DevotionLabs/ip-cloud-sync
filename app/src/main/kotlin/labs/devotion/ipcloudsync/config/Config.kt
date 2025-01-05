@@ -1,4 +1,4 @@
-object ConfigManager {
+object Config {
 
     private val environment: Map<String, String> = System.getenv()
 
@@ -8,6 +8,6 @@ object ConfigManager {
 
     fun getEnv(configKey: ConfigKey, default: String? = null): String {
         return environment[configKey.key] ?: default
-        ?: throw IllegalStateException("Environment variable '\${configKey.key}' is not set and no default value was provided.")
+            ?: throw IllegalStateException("Environment variable '\${configKey.key}' is not set and no default value was provided.")
     }
 }

@@ -1,21 +1,37 @@
 package labs.devotion.ipcloudsync.httpclient
 
 import okhttp3.*
+import okhttp3.Headers.Companion.headersOf
 import java.io.IOException
 
 class HttpClient(
-    private val protocol: Protocol, private val server: String
+    private val protocol: Protocol, private val server: String, private val token: String? = null
 ) {
     private val client = OkHttpClient()
 
-    fun get(endpoint: String): String {
+    fun get(endpoint: String, headers: Headers = headersOf()): String {
         val url = buildUrl(endpoint)
-        val requestBuilder = Request.Builder().url(url)
-
-        val request = requestBuilder.build()
+        val request = buildRequest(url, headers)
 
         val response = client.newCall(request).execute()
         return handleResponse(response)
+    }
+
+    private fun buildRequest(url: String, headers: Headers = headersOf()): Request {
+        val requestBuilder = Request.Builder().url(url)
+        val reqWithHeaders = setHeaders(requestBuilder, headers)
+
+        return reqWithHeaders.build()
+    }
+
+    private fun setHeaders(builder: Request.Builder, headers: Headers): Request.Builder {
+        val builderWithHeaders = builder.headers(headers)
+
+        if (token != null) {
+            builderWithHeaders.addHeader("Authorization", "Bearer $token")
+        }
+
+        return builderWithHeaders
     }
 
     private fun handleResponse(response: Response): String {
@@ -26,7 +42,11 @@ class HttpClient(
                 throw IOException("Unexpected code ${it.code} $body")
             }
 
-            return body ?: throw IOException("Response body is empty")
+            if (body.isNullOrEmpty()){
+                return ""
+            }
+
+            return body
         }
     }
 

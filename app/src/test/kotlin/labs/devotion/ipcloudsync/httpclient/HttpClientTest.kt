@@ -26,9 +26,7 @@ class HttpClientTest {
     fun `test GET request`() {
         val exampleIp = "192.168.1.1"
 
-        val mockResponse = MockResponse()
-            .setResponseCode(200)
-            .setBody(exampleIp)
+        val mockResponse = MockResponse().setResponseCode(200).setBody(exampleIp)
         mockWebServer.enqueue(mockResponse)
 
         val response = client.get("/test-endpoint")
@@ -44,5 +42,15 @@ class HttpClientTest {
         assertFailsWith<IOException> {
             client.get("/test-endpoint")
         }
+    }
+
+    @Test
+    fun `test GET request with empty body`() {
+        val mockResponse = MockResponse().setResponseCode(200)
+        mockWebServer.enqueue(mockResponse)
+
+        val response = client.get("/test-endpoint")
+
+        assertEquals("", response)
     }
 }

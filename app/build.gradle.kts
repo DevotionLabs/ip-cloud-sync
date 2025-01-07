@@ -8,7 +8,9 @@
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.5.0"
+    id("org.jetbrains.kotlin.jvm") version "2.0.0"
+
+    kotlin("plugin.serialization") version "2.0.0"
 
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 
@@ -22,6 +24,12 @@ repositories {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 

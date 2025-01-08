@@ -9,6 +9,16 @@ import labs.devotion.ipcloudsync.logger.Logger
 
 object SyncTask : Runnable {
     override fun run() {
+        Logger.debug("IP sync task started")
+
+        try {
+            syncIp()
+        } catch (e: Exception) {
+            Logger.error("IP Sync process failed: ${e.message}")
+        }
+    }
+
+    private fun syncIp() {
         val realIp = fetchRealIp()
         val cloudflareIp = fetchCloudflareIp()
 
@@ -16,6 +26,7 @@ object SyncTask : Runnable {
     }
 
     private fun fetchRealIp(): String {
+        Logger.debug("Fetching public IP address provided by ISP")
         val ipFetchServerUrl = Config.getEnv(ConfigKeys.IP_FETCH_SERVER_URL)
         val httpClient = HttpClient(ipFetchServerUrl)
         val ipFetcher = IpFetcher(httpClient)
@@ -27,6 +38,7 @@ object SyncTask : Runnable {
         val cloudflareApiToken = Config.getEnv(ConfigKeys.CLOUDFLARE_API_TOKEN)
         val domain = Config.getEnv(ConfigKeys.DOMAIN)
 
+        Logger.debug("Fetching Cloudflare proxy IP address for domain $domain")
         val httpClient = HttpClient(server = cloudflareApiUrl, token = cloudflareApiToken)
         val cloudflareClient = CloudflareClient(httpClient)
         return cloudflareClient.resolveDomainToIp(domain)
@@ -34,10 +46,10 @@ object SyncTask : Runnable {
 
     private fun resyncCloudflareIp(realIp: String, cloudflareIp: String) {
         if (realIp == cloudflareIp) {
-            Logger.info("The Cloudflare proxy is already resolving to the proper IP address")
+            Logger.info("The Cloudflare proxy is already resolving to the proper IP address: $realIp")
             return
         }
 
-        Logger.warning("The Cloudflare proxy resolves to a wrong IP address")
+        Logger.warning("Cloudflare proxy IP ($cloudflareIp) differs from real IP ($realIp). Syncing required.")
     }
 }

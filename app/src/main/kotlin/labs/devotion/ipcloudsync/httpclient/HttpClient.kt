@@ -1,5 +1,6 @@
 package labs.devotion.ipcloudsync.httpclient
 
+import labs.devotion.ipcloudsync.logger.Logger
 import okhttp3.*
 import okhttp3.Headers.Companion.headersOf
 import java.io.IOException
@@ -11,6 +12,7 @@ class HttpClient(
 
     fun get(endpoint: String, headers: Headers = headersOf()): String {
         val url = buildUrl(endpoint)
+        Logger.debug("Performing GET request to URL: $url")
         val request = buildRequest(url, headers)
 
         val response = client.newCall(request).execute()
@@ -39,6 +41,7 @@ class HttpClient(
             val body = it.body?.string()
 
             if (!it.isSuccessful) {
+                Logger.error("HTTP request failed with status code: ${it.code}, body: $body")
                 throw IOException("Unexpected code ${it.code} $body")
             }
 

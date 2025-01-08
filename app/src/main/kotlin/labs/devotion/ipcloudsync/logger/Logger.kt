@@ -5,9 +5,14 @@ import java.time.LocalDateTime
 object Logger {
 
     enum class LogLevel(val color: Color) {
+        DEBUG(Color.GRAY),
         INFO(Color.BLUE),
         WARNING(Color.YELLOW),
         ERROR(Color.RED);
+    }
+
+    fun debug(message: String) {
+        log(message, LogLevel.DEBUG)
     }
 
     fun info(message: String) {

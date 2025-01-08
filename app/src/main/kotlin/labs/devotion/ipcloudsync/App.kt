@@ -9,7 +9,8 @@ fun main() {
     Logger.info("IP CloudSync application started")
 
     val frequencyMins = Config.getEnv(ConfigKeys.CRON_FREQUENCY_MINS)
-    val ipSyncer = IpSyncer(frequencyMins.toLong())
+    Logger.info("Scheduled IP sync frequency: $frequencyMins minutes")
 
+    val ipSyncer = IpSyncer(frequencyMins.toLong())
     ipSyncer.start()
 }

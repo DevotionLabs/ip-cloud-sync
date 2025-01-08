@@ -3,7 +3,6 @@ package labs.devotion.ipcloudsync.cloudflareclient
 import kotlinx.serialization.json.Json
 import labs.devotion.ipcloudsync.httpclient.HttpClient
 import labs.devotion.ipcloudsync.httpclient.PredefinedHeaders
-import labs.devotion.ipcloudsync.httpclient.Protocol
 import labs.devotion.ipcloudsync.httpclient.fromPredefined
 import okhttp3.Headers
 

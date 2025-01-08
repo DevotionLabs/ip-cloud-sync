@@ -3,3 +3,8 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore IntelliJ project files
+.idea/gradle.xml
+.idea/kotlinc.xml
+.idea/misc.xml

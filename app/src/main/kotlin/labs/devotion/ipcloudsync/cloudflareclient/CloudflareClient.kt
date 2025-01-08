@@ -7,11 +7,7 @@ import labs.devotion.ipcloudsync.httpclient.Protocol
 import labs.devotion.ipcloudsync.httpclient.fromPredefined
 import okhttp3.Headers
 
-const val CLOUDFLARE_API_URL = "api.cloudflare.com"
-
-class CloudflareClient(token: String?) {
-
-    private val httpClient = HttpClient(Protocol.HTTPS, CLOUDFLARE_API_URL, token)
+class CloudflareClient(private val httpClient: HttpClient) {
 
     private val customJson = Json {
         ignoreUnknownKeys = true // Avoid failure on omitted keys
@@ -48,7 +44,7 @@ class CloudflareClient(token: String?) {
         val record = dnsRecords.find { it.zone_name == domain }
 
         if (record == null) {
-            throw Exception("Could not find any DNS record for domain \$domain")
+            throw Exception("Could not find any DNS record for domain $domain")
         }
 
         return record.content

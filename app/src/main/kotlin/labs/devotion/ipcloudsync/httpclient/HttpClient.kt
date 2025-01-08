@@ -5,7 +5,7 @@ import okhttp3.Headers.Companion.headersOf
 import java.io.IOException
 
 class HttpClient(
-    private val protocol: Protocol, private val server: String, private val token: String? = null
+    private val server: String, private val token: String? = null
 ) {
     private val client = OkHttpClient()
 
@@ -42,7 +42,7 @@ class HttpClient(
                 throw IOException("Unexpected code ${it.code} $body")
             }
 
-            if (body.isNullOrEmpty()){
+            if (body.isNullOrEmpty()) {
                 return ""
             }
 
@@ -51,6 +51,6 @@ class HttpClient(
     }
 
     private fun buildUrl(endpoint: String): String {
-        return "${protocol}${server}${endpoint}"
+        return "${server}${endpoint}"
     }
 }

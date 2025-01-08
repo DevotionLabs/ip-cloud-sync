@@ -14,7 +14,8 @@ class HttpClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        client = HttpClient(Protocol.HTTP, mockWebServer.hostName + ":" + mockWebServer.port)
+        val serverUrl = "http://${mockWebServer.hostName}:${mockWebServer.port}"
+        client = HttpClient(serverUrl)
     }
 
     @AfterTest

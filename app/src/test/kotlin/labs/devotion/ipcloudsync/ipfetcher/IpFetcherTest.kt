@@ -1,7 +1,6 @@
 package labs.devotion.ipcloudsync.ipfetcher
 
 import labs.devotion.ipcloudsync.httpclient.HttpClient
-import labs.devotion.ipcloudsync.httpclient.Protocol
 import labs.devotion.ipcloudsync.iptools.IpTools
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -20,7 +19,8 @@ class IpFetcherTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        httpClient = HttpClient(Protocol.HTTP, mockWebServer.hostName + ":" + mockWebServer.port)
+        val serverUrl = "http://${mockWebServer.hostName}:${mockWebServer.port}"
+        httpClient = HttpClient(serverUrl)
     }
 
     @After

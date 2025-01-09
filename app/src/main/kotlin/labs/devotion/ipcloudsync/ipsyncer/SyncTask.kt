@@ -8,6 +8,25 @@ import labs.devotion.ipcloudsync.ipfetcher.IpFetcher
 import labs.devotion.ipcloudsync.logger.Logger
 
 object SyncTask : Runnable {
+
+    private val ipFetcher by lazy {
+        val ipFetchServerUrl = Config.getEnv(ConfigKeys.IP_FETCH_SERVER_URL)
+        val httpClient = HttpClient(ipFetchServerUrl)
+
+        IpFetcher(httpClient)
+    }
+
+    private val cloudflareClient by lazy {
+        val cloudflareApiUrl = Config.getEnv(ConfigKeys.CLOUDFLARE_API_URL)
+        val cloudflareApiToken = Config.getEnv(ConfigKeys.CLOUDFLARE_API_TOKEN)
+
+        val httpClient = HttpClient(server = cloudflareApiUrl, token = cloudflareApiToken)
+
+        CloudflareClient(httpClient)
+    }
+
+    private val domain = Config.getEnv(ConfigKeys.DOMAIN)
+
     override fun run() {
         Logger.debug("IP sync task started")
 
@@ -27,20 +46,11 @@ object SyncTask : Runnable {
 
     private fun fetchRealIp(): String {
         Logger.debug("Fetching public IP address provided by ISP")
-        val ipFetchServerUrl = Config.getEnv(ConfigKeys.IP_FETCH_SERVER_URL)
-        val httpClient = HttpClient(ipFetchServerUrl)
-        val ipFetcher = IpFetcher(httpClient)
         return ipFetcher.fetchPublicIp()
     }
 
     private fun fetchCloudflareIp(): String {
-        val cloudflareApiUrl = Config.getEnv(ConfigKeys.CLOUDFLARE_API_URL)
-        val cloudflareApiToken = Config.getEnv(ConfigKeys.CLOUDFLARE_API_TOKEN)
-        val domain = Config.getEnv(ConfigKeys.DOMAIN)
-
         Logger.debug("Fetching Cloudflare proxy IP address for domain $domain")
-        val httpClient = HttpClient(server = cloudflareApiUrl, token = cloudflareApiToken)
-        val cloudflareClient = CloudflareClient(httpClient)
         return cloudflareClient.resolveDomainToIp(domain)
     }
 

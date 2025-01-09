@@ -7,7 +7,7 @@ class IpSyncer(private val frequencyInMins: Long) {
 
     private val scheduler = Executors.newScheduledThreadPool(1)
 
-    fun start(){
+    fun start() {
         scheduler.scheduleAtFixedRate(SyncTask, 0, frequencyInMins, TimeUnit.MINUTES)
     }
 

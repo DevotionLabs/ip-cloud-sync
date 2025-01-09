@@ -12,7 +12,7 @@ plugins {
 
     kotlin("plugin.serialization") version "2.0.0"
 
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 
     // Apply the application plugin to add support for building a CLI application in Java.
     application
@@ -49,4 +49,19 @@ dependencies {
 application {
     // Define the main class for the application.
     mainClass.set("labs.devotion.ipcloudsync.AppKt")
+}
+
+ktlint {
+    // version.set("0.49.0") // Update to the latest compatible version
+    disabledRules.set(setOf("no-wildcard-imports")) // Allow wildcard imports
+}
+
+kotlin {
+    // Ensure consistent JVM target compatibility
+    jvmToolchain(17)
+}
+
+tasks.withType<JavaCompile> {
+    targetCompatibility = "17"
+    sourceCompatibility = "17"
 }

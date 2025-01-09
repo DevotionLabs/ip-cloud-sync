@@ -1,13 +1,13 @@
 package labs.devotion.ipcloudsync.cloudflareclient
 
 import labs.devotion.ipcloudsync.httpclient.HttpClient
-import labs.devotion.ipcloudsync.logger.Logger
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import kotlin.test.*
 
 const val domain = "example.com"
 const val zoneId = "450adf5f78543a8e568b665ce5c796543"
+const val recordId = "8732f5e6eba4455c0b3454d98bd8eed0"
 const val ipAddress = "80.80.80.80"
 
 class CloudflareClientTest {
@@ -19,7 +19,7 @@ class CloudflareClientTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
         val serverUrl = "http://${mockWebServer.hostName}:${mockWebServer.port}"
-        val httpClient  = HttpClient(serverUrl, "test-token")
+        val httpClient = HttpClient(serverUrl, "test-token")
         client = CloudflareClient(httpClient)
     }
 
@@ -42,7 +42,7 @@ class CloudflareClientTest {
 
     @Test
     fun `test resolveDomainToIp with no matching DNS record`() {
-        val mockZoneResponse  = mockSuccessZoneResponse()
+        val mockZoneResponse = mockSuccessZoneResponse()
         mockWebServer.enqueue(mockZoneResponse)
 
         val mockEmptyDnsResponse = mockEmptyResponse()
@@ -106,13 +106,13 @@ class CloudflareClientTest {
         return """
                 {
                     "result": [
-                        { "zone_name": "$domain", "content": "$ipAddress" }
+                        { "zone_name": "$domain", "content": "$ipAddress", "id": "$recordId" }
                     ],
                 "errors": [],
                 "messages": [],
                     "success": true
                 }
-            """.trimIndent()
+        """.trimIndent()
     }
 
     private fun mockSuccessResponse(body: String): MockResponse {

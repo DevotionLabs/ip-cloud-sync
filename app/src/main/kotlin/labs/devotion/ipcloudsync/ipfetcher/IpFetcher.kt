@@ -9,5 +9,4 @@ class IpFetcher(private val httpClient: HttpClient) {
         val ip = httpClient.get("/")
         return IpTools.validateIp(ip)
     }
-
 }

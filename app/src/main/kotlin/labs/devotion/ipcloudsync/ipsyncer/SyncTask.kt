@@ -61,5 +61,6 @@ object SyncTask : Runnable {
         }
 
         Logger.warning("Cloudflare proxy IP ($cloudflareIp) differs from real IP ($realIp). Syncing required.")
+        cloudflareClient.updateDomainIp(domain = domain, newIp = realIp)
     }
 }

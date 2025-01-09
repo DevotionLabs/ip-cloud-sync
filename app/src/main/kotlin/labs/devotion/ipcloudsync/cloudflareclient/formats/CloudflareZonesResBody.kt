@@ -1,17 +1,11 @@
-package labs.devotion.ipcloudsync.cloudflareclient
+package labs.devotion.ipcloudsync.cloudflareclient.formats
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CloudflareZonesResponse(
+data class CloudflareZonesResBody(
     val result: List<Zone>,
     val success: Boolean,
     val errors: List<String>,
     val messages: List<String>
-)
-
-@Serializable
-data class Zone(
-    val id: String,
-    val name: String
 )

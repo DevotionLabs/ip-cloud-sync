@@ -25,7 +25,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `Should obtain a valid response for a GET request`() {
+    fun `should obtain a valid response for a GET request`() {
         val exampleIp = "192.168.1.1"
 
         val mockResponse = createMockResponse(exampleIp)
@@ -37,7 +37,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `Should throw an exception for a GET request to a non-existent path`() {
+    fun `should throw an exception for a GET request to a non-existent path`() {
         val mockResponse = createMockResponse("", 404)
         mockWebServer.enqueue(mockResponse)
 
@@ -47,7 +47,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `Should obtain an empty string when response body is nullish`() {
+    fun `should obtain an empty string when response body is nullish`() {
         val mockResponse = MockResponse().setResponseCode(200)
         mockWebServer.enqueue(mockResponse)
 

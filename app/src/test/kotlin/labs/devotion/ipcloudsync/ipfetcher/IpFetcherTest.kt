@@ -29,7 +29,7 @@ class IpFetcherTest {
     }
 
     @Test
-    fun `Should return a valid IP on fetching it`() {
+    fun `should return a valid IP on fetching it`() {
         val validIp = "192.168.1.1"
         val mockResponse = createMockResponse(validIp)
         mockWebServer.enqueue(mockResponse)
@@ -39,7 +39,7 @@ class IpFetcherTest {
     }
 
     @Test
-    fun `Should throw an exception on response including an invalid IP`() {
+    fun `should throw an exception on response including an invalid IP`() {
         val invalidIp = "invalid_ip"
         val mockResponse = createMockResponse(invalidIp)
         mockWebServer.enqueue(mockResponse)

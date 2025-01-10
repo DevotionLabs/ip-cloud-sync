@@ -23,7 +23,7 @@ class CloudflareClientTest {
     }
 
     @Test
-    fun `Should resolve a domain to a valid IP address`() {
+    fun `should resolve a domain to a valid IP address`() {
         val successZoneResponse = createMockResponse(MockResponses.successZone)
         val successDnsResponse = createMockResponse(MockResponses.successDns)
 
@@ -35,7 +35,7 @@ class CloudflareClientTest {
     }
 
     @Test
-    fun `Should throw an error on trying to resolve an unknown domain`() {
+    fun `should throw an error on trying to resolve an unknown domain`() {
         val successZoneResponse = createMockResponse(MockResponses.successZone)
         val emptyResultResponse = createMockResponse(MockResponses.emptyResult)
 
@@ -50,7 +50,7 @@ class CloudflareClientTest {
     }
 
     @Test
-    fun `Should throw an error on trying to resolve a domain for which there is no zone defined`() {
+    fun `should throw an error on trying to resolve a domain for which there is no zone defined`() {
         val emptyResultResponse = createMockResponse(MockResponses.emptyResult)
         mockWebServer.enqueue(emptyResultResponse)
 

@@ -5,11 +5,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import kotlin.test.*
 
-const val domain = "example.com"
-const val zoneId = "450adf5f78543a8e568b665ce5c796543"
-const val recordId = "8732f5e6eba4455c0b3454d98bd8eed0"
-const val ipAddress = "80.80.80.80"
-
 class CloudflareClientTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var client: CloudflareClient
@@ -18,7 +13,7 @@ class CloudflareClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        val serverUrl = "http://${mockWebServer.hostName}:${mockWebServer.port}"
+        val serverUrl = mockWebServer.url("/").toString()
         val httpClient = HttpClient(serverUrl, "test-token")
         client = CloudflareClient(httpClient)
     }
@@ -29,24 +24,24 @@ class CloudflareClientTest {
     }
 
     @Test
-    fun `test resolveDomainToIp with valid domain`() {
-        val mockZoneResponse = mockSuccessZoneResponse()
-        mockWebServer.enqueue(mockZoneResponse)
+    fun `Should resolve a domain to a valid IP address`() {
+        val successZoneResponse = mockResponse(MockResponses.successZone)
+        val successDnsResponse = mockResponse(MockResponses.successDns)
 
-        val mockDnsResponse = mockSuccessDnsResponse()
-        mockWebServer.enqueue(mockDnsResponse)
+        mockWebServer.enqueue(successZoneResponse)
+        mockWebServer.enqueue(successDnsResponse)
 
         val resolvedIp = client.resolveDomainToIp(domain)
         assertEquals(ipAddress, resolvedIp)
     }
 
     @Test
-    fun `test resolveDomainToIp with no matching DNS record`() {
-        val mockZoneResponse = mockSuccessZoneResponse()
-        mockWebServer.enqueue(mockZoneResponse)
+    fun `Should throw an error on trying to resolve an unknown domain`() {
+        val successZoneResponse = mockResponse(MockResponses.successZone)
+        val emptyResultResponse = mockResponse(MockResponses.emptyResult)
 
-        val mockEmptyDnsResponse = mockEmptyResponse()
-        mockWebServer.enqueue(mockEmptyDnsResponse)
+        mockWebServer.enqueue(successZoneResponse)
+        mockWebServer.enqueue(emptyResultResponse)
 
         val exception = assertFailsWith<Exception> {
             client.resolveDomainToIp(domain)
@@ -56,66 +51,18 @@ class CloudflareClientTest {
     }
 
     @Test
-    fun `test resolveDomainToIp with invalid zone`() {
-        val mockEmptyZoneResponse = mockEmptyResponse()
-        mockWebServer.enqueue(mockEmptyZoneResponse)
+    fun `Should throw an error on trying to resolve a domain for which there is no zone defined`() {
+        val emptyResultResponse = mockResponse(MockResponses.emptyResult)
+        mockWebServer.enqueue(emptyResultResponse)
 
         val exception = assertFailsWith<Exception> {
-            val ip = client.resolveDomainToIp(domain)
+            client.resolveDomainToIp(domain)
         }
 
         assertEquals("No zone has been defined for domain $domain", exception.message)
     }
 
-    private fun mockEmptyResponse(): MockResponse {
-        val emptyResultBody = """
-            {
-                "result": [],
-                "errors": [],
-                "messages": [],
-                "success": true
-            }
-        """.trimIndent()
-        return mockSuccessResponse(emptyResultBody)
-    }
-
-    private fun mockSuccessZoneResponse(): MockResponse {
-        val body = createZoneResponseBody()
-        return mockSuccessResponse(body)
-    }
-
-    private fun mockSuccessDnsResponse(): MockResponse {
-        val body = createDnsResponseBody()
-        return mockSuccessResponse(body)
-    }
-
-    private fun createZoneResponseBody(): String {
-        return """
-            {
-                "result": [
-                    { "id": "$zoneId", "name": "$domain" }
-                ],
-                "errors": [],
-                "messages": [],
-                "success": true
-            }
-        """.trimIndent()
-    }
-
-    private fun createDnsResponseBody(): String {
-        return """
-                {
-                    "result": [
-                        { "zone_name": "$domain", "content": "$ipAddress", "id": "$recordId" }
-                    ],
-                "errors": [],
-                "messages": [],
-                    "success": true
-                }
-        """.trimIndent()
-    }
-
-    private fun mockSuccessResponse(body: String): MockResponse {
-        return MockResponse().setResponseCode(200).setBody(body)
+    private fun mockResponse(body: String, code: Int = 200): MockResponse {
+        return MockResponse().setResponseCode(code).setBody(body)
     }
 }

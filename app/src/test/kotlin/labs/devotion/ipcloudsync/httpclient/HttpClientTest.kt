@@ -14,7 +14,7 @@ class HttpClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        val serverUrl = "http://${mockWebServer.hostName}:${mockWebServer.port}"
+        val serverUrl = mockWebServer.url("/").toString()
         client = HttpClient(serverUrl)
     }
 
@@ -24,7 +24,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `test GET request`() {
+    fun `Should obtain a valid response for a GET request`() {
         val exampleIp = "192.168.1.1"
 
         val mockResponse = MockResponse().setResponseCode(200).setBody(exampleIp)
@@ -36,7 +36,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `test GET request with error response`() {
+    fun `Should throw an exception for a GET request to a non-existent path`() {
         val mockResponse = MockResponse().setResponseCode(404)
         mockWebServer.enqueue(mockResponse)
 
@@ -46,7 +46,7 @@ class HttpClientTest {
     }
 
     @Test
-    fun `test GET request with empty body`() {
+    fun `Should obtain an empty string when response body is nullish`() {
         val mockResponse = MockResponse().setResponseCode(200)
         mockWebServer.enqueue(mockResponse)
 

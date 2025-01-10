@@ -6,6 +6,9 @@ import labs.devotion.ipcloudsync.ipsyncer.IpSyncer
 import labs.devotion.ipcloudsync.logger.Logger
 
 fun main() {
+    val logLevel = Config.getEnv(ConfigKeys.LOG_LEVEL)
+    Logger.setLevel(logLevel)
+
     Logger.info("IP CloudSync application started")
 
     val frequencyMins = Config.getEnv(ConfigKeys.CRON_FREQUENCY_MINS)

@@ -1,5 +1,7 @@
 package labs.devotion.ipcloudsync.httpclient
 
+import labs.devotion.ipcloudsync.testutils.TestUtils.createMockHttpClient
+import labs.devotion.ipcloudsync.testutils.TestUtils.createMockResponse
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import java.io.IOException
@@ -14,8 +16,7 @@ class HttpClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        val serverUrl = mockWebServer.url("/").toString()
-        client = HttpClient(serverUrl)
+        client = createMockHttpClient(mockWebServer)
     }
 
     @AfterTest
@@ -27,17 +28,17 @@ class HttpClientTest {
     fun `Should obtain a valid response for a GET request`() {
         val exampleIp = "192.168.1.1"
 
-        val mockResponse = MockResponse().setResponseCode(200).setBody(exampleIp)
+        val mockResponse = createMockResponse(exampleIp)
         mockWebServer.enqueue(mockResponse)
 
-        val response = client.get("/test-endpoint")
+        val actualResponse = client.get("/test-endpoint")
 
-        assertEquals(exampleIp, response)
+        assertEquals(exampleIp, actualResponse)
     }
 
     @Test
     fun `Should throw an exception for a GET request to a non-existent path`() {
-        val mockResponse = MockResponse().setResponseCode(404)
+        val mockResponse = createMockResponse("", 404)
         mockWebServer.enqueue(mockResponse)
 
         assertFailsWith<IOException> {

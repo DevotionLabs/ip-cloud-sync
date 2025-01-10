@@ -1,7 +1,7 @@
 package labs.devotion.ipcloudsync.cloudflareclient
 
-import labs.devotion.ipcloudsync.httpclient.HttpClient
-import okhttp3.mockwebserver.MockResponse
+import labs.devotion.ipcloudsync.testutils.TestUtils.createMockHttpClient
+import labs.devotion.ipcloudsync.testutils.TestUtils.createMockResponse
 import okhttp3.mockwebserver.MockWebServer
 import kotlin.test.*
 
@@ -13,8 +13,7 @@ class CloudflareClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        val serverUrl = mockWebServer.url("/").toString()
-        val httpClient = HttpClient(serverUrl, "test-token")
+        val httpClient = createMockHttpClient(mockWebServer, "test-token")
         client = CloudflareClient(httpClient)
     }
 
@@ -25,8 +24,8 @@ class CloudflareClientTest {
 
     @Test
     fun `Should resolve a domain to a valid IP address`() {
-        val successZoneResponse = mockResponse(MockResponses.successZone)
-        val successDnsResponse = mockResponse(MockResponses.successDns)
+        val successZoneResponse = createMockResponse(MockResponses.successZone)
+        val successDnsResponse = createMockResponse(MockResponses.successDns)
 
         mockWebServer.enqueue(successZoneResponse)
         mockWebServer.enqueue(successDnsResponse)
@@ -37,8 +36,8 @@ class CloudflareClientTest {
 
     @Test
     fun `Should throw an error on trying to resolve an unknown domain`() {
-        val successZoneResponse = mockResponse(MockResponses.successZone)
-        val emptyResultResponse = mockResponse(MockResponses.emptyResult)
+        val successZoneResponse = createMockResponse(MockResponses.successZone)
+        val emptyResultResponse = createMockResponse(MockResponses.emptyResult)
 
         mockWebServer.enqueue(successZoneResponse)
         mockWebServer.enqueue(emptyResultResponse)
@@ -52,7 +51,7 @@ class CloudflareClientTest {
 
     @Test
     fun `Should throw an error on trying to resolve a domain for which there is no zone defined`() {
-        val emptyResultResponse = mockResponse(MockResponses.emptyResult)
+        val emptyResultResponse = createMockResponse(MockResponses.emptyResult)
         mockWebServer.enqueue(emptyResultResponse)
 
         val exception = assertFailsWith<Exception> {
@@ -60,9 +59,5 @@ class CloudflareClientTest {
         }
 
         assertEquals("No zone has been defined for domain $domain", exception.message)
-    }
-
-    private fun mockResponse(body: String, code: Int = 200): MockResponse {
-        return MockResponse().setResponseCode(code).setBody(body)
     }
 }

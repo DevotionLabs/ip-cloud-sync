@@ -17,30 +17,45 @@ class HttpClient(
     private val client = OkHttpClient()
 
     fun get(endpoint: String, headers: Headers = headersOf()): String {
-        val url = buildUrl(endpoint)
-        Logger.debug("Performing GET request to URL: $url")
-        val request = prepareRequest(url, headers).build()
+        val request = buildGetRequest(endpoint, headers)
+        Logger.debug("Performing GET request to URL: ${request.url}")
 
-        val response = client.newCall(request).execute()
+        val response = executeRequest(request)
         return handleResponse(response)
     }
 
     fun put(endpoint: String, body: String, headers: Headers = headersOf()): String {
-        val url = buildUrl(endpoint)
-        Logger.debug("Performing PUT request to URL: $url with body: $body")
+        val request = buildPutRequest(endpoint, body, headers)
 
-        val request =
-            prepareRequest(url, headers).put(body.toRequestBody("application/json".toMediaTypeOrNull())).build()
+        Logger.debug("Performing PUT request to ${request.url} with body: $body")
 
-        val response = client.newCall(request).execute()
+        val response = executeRequest(request)
         return handleResponse(response)
     }
 
-    private fun prepareRequest(url: String, headers: Headers = headersOf()): Request.Builder {
-        val requestBuilder = Request.Builder().url(url)
-        val reqWithHeaders = setHeaders(requestBuilder, headers)
+    private fun buildGetRequest(endpoint: String, headers: Headers = headersOf()): Request {
+        val url = buildUrl(endpoint)
 
-        return reqWithHeaders
+        return createRequestBuilder(url, headers).build()
+    }
+
+    private fun buildPutRequest(endpoint: String, body: String, headers: Headers = headersOf()): Request {
+        val url = buildUrl(endpoint)
+
+        val rawRequest = createRequestBuilder(url, headers)
+        val jsonType = "application/json".toMediaTypeOrNull()
+        val jsonBody = body.toRequestBody(jsonType)
+
+        return rawRequest.put(jsonBody).build()
+    }
+
+    private fun buildUrl(endpoint: String): String {
+        return "$server$endpoint"
+    }
+
+    private fun createRequestBuilder(url: String, headers: Headers = headersOf()): Request.Builder {
+        val requestBuilder = Request.Builder().url(url)
+        return setHeaders(requestBuilder, headers)
     }
 
     private fun setHeaders(builder: Request.Builder, headers: Headers): Request.Builder {
@@ -51,6 +66,10 @@ class HttpClient(
         }
 
         return builderWithHeaders
+    }
+
+    private fun executeRequest(request: Request): Response {
+        return client.newCall(request).execute()
     }
 
     private fun handleResponse(response: Response): String {
@@ -68,9 +87,5 @@ class HttpClient(
 
             return body
         }
-    }
-
-    private fun buildUrl(endpoint: String): String {
-        return "$server$endpoint"
     }
 }

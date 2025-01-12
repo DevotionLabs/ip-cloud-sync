@@ -7,7 +7,10 @@ import labs.devotion.ipcloudsync.httpclient.HttpClient
 import labs.devotion.ipcloudsync.httpclient.PredefinedHeaders
 import labs.devotion.ipcloudsync.httpclient.fromPredefined
 import labs.devotion.ipcloudsync.logger.Logger
+import labs.devotion.ipcloudsync.validator.NetworkFormatValidator.validateDomain
 import okhttp3.Headers
+
+private val acceptJsonHeader = Headers.fromPredefined(PredefinedHeaders.ACCEPT_JSON)
 
 class CloudflareClient(private val httpClient: HttpClient) {
 
@@ -16,12 +19,23 @@ class CloudflareClient(private val httpClient: HttpClient) {
     }
 
     fun resolveDomainToIp(domain: String): String {
+        validateDomain(domain)
         Logger.debug("Resolving domain $domain to an IP")
         val zoneId = fetchZoneIdByDomain(domain)
 
         Logger.info("Found zone ID for domain $domain: $zoneId")
         val dnsRecord = fetchDnsRecordForDomain(zoneId = zoneId, domain = domain)
         return dnsRecord.content
+    }
+
+    fun updateDomainIp(domain: String, newIp: String) {
+        Logger.debug("Updating domain Ip")
+        val zoneId = fetchZoneIdByDomain(domain)
+
+        Logger.info("Found zone ID for domain $domain: $zoneId")
+        val dnsRecord = fetchDnsRecordForDomain(zoneId = zoneId, domain = domain)
+
+        updateDnsRecordIp(ip = newIp, zoneId = zoneId, recordId = dnsRecord.id, domain = domain)
     }
 
     private fun fetchZoneIdByDomain(domain: String): String {
@@ -37,7 +51,7 @@ class CloudflareClient(private val httpClient: HttpClient) {
     private fun fetchZones(): List<Zone> {
         Logger.debug("Fetching all zones from Cloudflare")
         val endpoint = "/client/v4/zones"
-        val zonesResponse = httpClient.get(endpoint, Headers.fromPredefined(PredefinedHeaders.ACCEPT_JSON))
+        val zonesResponse = httpClient.get(endpoint, acceptJsonHeader)
         val decodedZonesResponse = customJson.decodeFromString<CloudflareZonesResBody>(zonesResponse)
 
         return decodedZonesResponse.result
@@ -56,20 +70,10 @@ class CloudflareClient(private val httpClient: HttpClient) {
     private fun fetchDnsRecords(zoneId: String): List<DnsRecords> {
         Logger.debug("Fetching DNS records for zone ID $zoneId")
         val endpoint = "/client/v4/zones/$zoneId/dns_records?type=A"
-        val dnsRecordsResult = httpClient.get(endpoint, Headers.fromPredefined(PredefinedHeaders.ACCEPT_JSON))
+        val dnsRecordsResult = httpClient.get(endpoint, acceptJsonHeader)
         val dnsRecords = customJson.decodeFromString<CloudflareRecordsResBody>(dnsRecordsResult)
 
         return dnsRecords.result
-    }
-
-    fun updateDomainIp(domain: String, newIp: String) {
-        Logger.debug("Updating domain Ip")
-        val zoneId = fetchZoneIdByDomain(domain)
-
-        Logger.info("Found zone ID for domain $domain: $zoneId")
-        val dnsRecord = fetchDnsRecordForDomain(zoneId = zoneId, domain = domain)
-
-        updateDnsRecordIp(ip = newIp, zoneId = zoneId, recordId = dnsRecord.id, domain = domain)
     }
 
     private fun updateDnsRecordIp(ip: String, zoneId: String, recordId: String, domain: String) {

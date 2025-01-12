@@ -3,11 +3,13 @@ package labs.devotion.ipcloudsync.logger
 import java.time.LocalDateTime
 
 object Logger {
-    private var userLevel: LogLevel = LogLevel.INFO
+    private var currentLevel: LogLevel = LogLevel.INFO
 
     fun setLevel(userLevel: String) {
-        this.userLevel = LogLevel.fromString(userLevel)
+        this.currentLevel = LogLevel.fromString(userLevel)
     }
+
+    fun getLevel() = currentLevel
 
     fun debug(message: String) {
         log(message, LogLevel.DEBUG)
@@ -28,7 +30,7 @@ object Logger {
     private fun log(message: String, msgLevel: LogLevel = LogLevel.INFO) {
         val timestamp = LocalDateTime.now()
 
-        if (msgLevel.isAtLeast(userLevel)) {
+        if (msgLevel.isAtLeast(currentLevel)) {
             println("${msgLevel.color}[$timestamp] [${msgLevel.name}] $message ${Color.RESET}")
         }
     }

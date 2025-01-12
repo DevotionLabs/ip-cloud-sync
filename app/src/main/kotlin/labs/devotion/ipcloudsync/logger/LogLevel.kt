@@ -1,6 +1,6 @@
 package labs.devotion.ipcloudsync.logger
 
-internal enum class LogLevel(internal val color: Color) {
+enum class LogLevel(internal val color: Color) {
     DEBUG(Color.GRAY), INFO(Color.BLUE), WARN(Color.YELLOW), ERROR(Color.RED);
 
     companion object {

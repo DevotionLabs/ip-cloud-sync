@@ -28,8 +28,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
-
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
@@ -44,6 +42,10 @@ dependencies {
 
     // Use the Kotlin JUnit integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
+
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }
 
 application {

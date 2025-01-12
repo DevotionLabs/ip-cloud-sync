@@ -1,8 +1,8 @@
 package labs.devotion.ipcloudsync.ipfetcher
 
-import labs.devotion.ipcloudsync.iptools.IpTools
 import labs.devotion.ipcloudsync.testutils.TestUtils.createMockHttpClient
 import labs.devotion.ipcloudsync.testutils.TestUtils.createMockResponse
+import labs.devotion.ipcloudsync.validator.NetworkFormatValidator
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
@@ -35,7 +35,7 @@ class IpFetcherTest {
         mockWebServer.enqueue(mockResponse)
 
         val ip = ipFetcher.fetchPublicIp()
-        assertTrue(IpTools.isValidIp(ip), "Expected a valid IP address, but got: $ip")
+        assertTrue(NetworkFormatValidator.isValidIp(ip), "Expected a valid IP address, but got: $ip")
     }
 
     @Test

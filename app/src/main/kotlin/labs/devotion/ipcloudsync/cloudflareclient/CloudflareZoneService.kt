@@ -10,7 +10,8 @@ import labs.devotion.ipcloudsync.logger.Logger
 import okhttp3.Headers
 
 class CloudflareZoneService(
-    private val httpClient: HttpClient, private val customJson: Json = Json { ignoreUnknownKeys = true }
+    private val httpClient: HttpClient,
+    private val customJson: Json = Json { ignoreUnknownKeys = true }
 ) {
     fun fetchZoneIdByDomain(domain: String): String {
         Logger.debug("Fetching zone ID for domain: $domain")

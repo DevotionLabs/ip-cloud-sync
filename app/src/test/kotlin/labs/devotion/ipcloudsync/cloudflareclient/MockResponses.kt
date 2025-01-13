@@ -15,7 +15,7 @@ internal object MockResponses {
     val successDns = """
         {
             "result": [
-                { "zone_name": "$domain", "content": "$ipAddress", "id": "$recordId" }
+                { "zone_id": "$zoneId", "zone_name": "$domain", "content": "$ipAddress", "id": "$recordId" }
             ],
             "errors": [],
             "messages": [],

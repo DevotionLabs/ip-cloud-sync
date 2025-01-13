@@ -13,8 +13,12 @@ class CloudflareClientTest {
     fun setUp() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
+
         val httpClient = createMockHttpClient(mockWebServer, "test-token")
-        client = CloudflareClient(httpClient)
+        val zoneService = CloudflareZoneService(httpClient)
+        val dnsService = CloudflareDnsService(zoneService, httpClient)
+
+        client = CloudflareClient(dnsService)
     }
 
     @AfterTest
@@ -30,7 +34,7 @@ class CloudflareClientTest {
         mockWebServer.enqueue(successZoneResponse)
         mockWebServer.enqueue(successDnsResponse)
 
-        val resolvedIp = client.resolveDomainToIp(domain)
+        val resolvedIp = client.fetchDomainProxiedIp(domain)
         assertEquals(ipAddress, resolvedIp)
     }
 
@@ -42,11 +46,9 @@ class CloudflareClientTest {
         mockWebServer.enqueue(successZoneResponse)
         mockWebServer.enqueue(emptyResultResponse)
 
-        val exception = assertFailsWith<Exception> {
-            client.resolveDomainToIp(domain)
+        assertFailsWith<IllegalArgumentException> {
+            client.fetchDomainProxiedIp(domain)
         }
-
-        assertEquals("Could not find any DNS record for domain $domain", exception.message)
     }
 
     @Test
@@ -54,10 +56,8 @@ class CloudflareClientTest {
         val emptyResultResponse = createMockResponse(MockResponses.emptyResult)
         mockWebServer.enqueue(emptyResultResponse)
 
-        val exception = assertFailsWith<Exception> {
-            client.resolveDomainToIp(domain)
+        assertFailsWith<IllegalArgumentException> {
+            client.fetchDomainProxiedIp(domain)
         }
-
-        assertEquals("No zone has been defined for domain $domain", exception.message)
     }
 }

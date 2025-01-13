@@ -1,6 +1,8 @@
 package labs.devotion.ipcloudsync.ipsyncer
 
 import labs.devotion.ipcloudsync.cloudflareclient.CloudflareClient
+import labs.devotion.ipcloudsync.cloudflareclient.CloudflareDnsService
+import labs.devotion.ipcloudsync.cloudflareclient.CloudflareZoneService
 import labs.devotion.ipcloudsync.config.Config
 import labs.devotion.ipcloudsync.config.ConfigKeys
 import labs.devotion.ipcloudsync.httpclient.HttpClient
@@ -22,7 +24,10 @@ object SyncTask : Runnable {
 
         val httpClient = HttpClient(server = cloudflareApiUrl, token = cloudflareApiToken)
 
-        CloudflareClient(httpClient)
+        val zoneService = CloudflareZoneService(httpClient)
+        val dnsService = CloudflareDnsService(zoneService, httpClient)
+
+        CloudflareClient(dnsService)
     }
 
     private val domain = Config.getEnv(ConfigKeys.DOMAIN)
@@ -51,7 +56,7 @@ object SyncTask : Runnable {
 
     private fun fetchCloudflareIp(): String {
         Logger.debug("Fetching Cloudflare proxy IP address for domain $domain")
-        return cloudflareClient.resolveDomainToIp(domain)
+        return cloudflareClient.fetchDomainProxiedIp(domain)
     }
 
     private fun resyncCloudflareIp(realIp: String, cloudflareIp: String) {
@@ -61,6 +66,6 @@ object SyncTask : Runnable {
         }
 
         Logger.warn("Cloudflare proxy IP ($cloudflareIp) differs from real IP ($realIp). Syncing required.")
-        cloudflareClient.updateDomainIp(domain = domain, newIp = realIp)
+        cloudflareClient.updateDomainProxiedIp(domain = domain, newIp = realIp)
     }
 }

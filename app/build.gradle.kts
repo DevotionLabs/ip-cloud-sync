@@ -49,18 +49,16 @@ dependencies {
 }
 
 application {
-    // Define the main class for the application.
     mainClass.set("labs.devotion.ipcloudsync.AppKt")
-}
-
-ktlint {
-    // version.set("0.49.0") // Update to the latest compatible version
-    disabledRules.set(setOf("no-wildcard-imports")) // Allow wildcard imports
 }
 
 kotlin {
     // Ensure consistent JVM target compatibility
     jvmToolchain(17)
+}
+
+ktlint {
+    enableExperimentalRules.set(true) // Ensure `.editorconfig` rules are used
 }
 
 tasks.withType<JavaCompile> {

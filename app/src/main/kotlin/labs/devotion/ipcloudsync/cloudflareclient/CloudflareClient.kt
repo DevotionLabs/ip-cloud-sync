@@ -23,7 +23,7 @@ class CloudflareClient(
         validateIp(newIp)
 
         Logger.debug("Updating DNS record for domain $domain to set content at new IP $newIp")
-        dnsService.updateDnsRecordIp(domain, newIp)
+        dnsService.updateDnsRecordIp(newIp = newIp, domain = domain)
 
         Logger.info("Successfully updated DNS record for domain: $domain to IP: $newIp")
     }

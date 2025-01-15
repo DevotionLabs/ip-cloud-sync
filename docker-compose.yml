@@ -1,0 +1,10 @@
+services:
+  ipsync:
+    image: ghcr.io/devotionlabs/ip-cloud-sync
+    environment:
+      IPCLOUDSYNC_CLOUDFLARE_API_URL: "https://api.cloudflare.com"
+      IPCLOUDSYNC_CLOUDFLARE_API_TOKEN: "YOUR_CLOUDFLARE_API_TOKEN"
+      IPCLOUDSYNC_CRON_FREQUENCY_MINS: "60"
+      IPCLOUDSYNC_DOMAIN: "yourdomain.com"
+      IPCLOUDSYNC_IP_FETCH_SERVER_URL: "https://api.ipify.org"
+      IPCLOUDSYNC_LOG_LEVEL: "INFO"

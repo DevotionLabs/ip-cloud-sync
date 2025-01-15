@@ -38,7 +38,7 @@ jobs:
       - name: Calculate new release version
         id: calculate_new_version
         run: |
-          NEW_VERSION=$(npx semver -i ${{ github.event.inputs.increment }} $LATEST_TAG)
+          NEW_VERSION=$(npx --yes semver -i ${{ github.event.inputs.increment }} $LATEST_TAG)
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Create release

@@ -1,0 +1,60 @@
+name: Release and Publish to GHCR
+
+on:
+  workflow_dispatch:
+    inputs:
+      increment:
+        description: "Select the version increment type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Get latest release version
+        run: |
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1 || echo "v0.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Calculate new release version
+        id: calculate_new_version
+        run: |
+          NEW_VERSION=$(npx semver -i ${{ github.event.inputs.increment }} $LATEST_TAG)
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          name: "v$NEW_VERSION"
+          tag_name: "v$NEW_VERSION"
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$NEW_VERSION .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$NEW_VERSION

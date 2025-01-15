@@ -16,6 +16,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +36,9 @@ jobs:
         run: |
           LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
           if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG="v0.0.0"
+            LATEST_TAG="0.0.0"
+          else
+            LATEST_TAG=${LATEST_TAG#v} # Remove the 'v' prefix if it exists
           fi
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
@@ -48,8 +52,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          name: "v$NEW_VERSION"
-          tag_name: "v$NEW_VERSION"
+          name: "$NEW_VERSION"
+          tag_name: "$NEW_VERSION"
 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin

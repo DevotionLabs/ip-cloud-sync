@@ -65,8 +65,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/$LC_OWNER/${{ github.event.repository.name }}:$NEW_VERSION .
+          docker build -t ghcr.io/${{ env.LC_OWNER }}/${{ github.event.repository.name }}:${{ env.NEW_VERSION }} .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/$LC_OWNER/${{ github.event.repository.name }}:$NEW_VERSION
+          docker push ghcr.io/${{ env.LC_OWNER }}/${{ github.event.repository.name }}:${{ env.NEW_VERSION }}

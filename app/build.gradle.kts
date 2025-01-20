@@ -32,6 +32,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 
     testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
+    implementation("commons-validator:commons-validator:1.9.0")
 }
 
 application {

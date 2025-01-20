@@ -1,9 +1,8 @@
 package labs.devotion.ipcloudsync.validator
 
 import labs.devotion.ipcloudsync.logger.Logger
+import org.apache.commons.validator.routines.DomainValidator
 import java.net.InetAddress
-
-private val DOMAIN_REGEX = Regex("^(?!-)[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,63}\$")
 
 object NetworkFormatValidator {
     fun validateIp(ip: String): String {
@@ -23,7 +22,12 @@ object NetworkFormatValidator {
 
     fun validateDomain(domain: String) {
         Logger.debug("Validating domain format: $domain")
-        require(domain.isNotBlank()) { "Domain must be defined" }
-        require(DOMAIN_REGEX.matches(domain)) { "Invalid domain format: $domain" }
+        require(isValidDomain(domain)) { "Invalid domain format: $domain" }
+    }
+
+    private fun isValidDomain(domain: String): Boolean {
+        val domainValidator = DomainValidator.getInstance(false)
+
+        return domainValidator.isValid(domain)
     }
 }

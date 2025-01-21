@@ -10,7 +10,7 @@ object Config {
 
     fun getEnv(configKey: ConfigKeys): String {
         return environment[configKey.key] ?: configKey.defaultValue
-        ?: throw IllegalStateException("Environment variable ${configKey.key} is not set and no default value was provided.")
+            ?: throw IllegalStateException("Environment variable ${configKey.key} is not set and no default value was provided.")
     }
 
     fun getIntEnv(configKey: ConfigKeys): Int {
@@ -19,7 +19,7 @@ object Config {
         try {
             return envValue.toInt()
         } catch (e: NumberFormatException) {
-            throw NumberFormatException("Could not parse environment variable ${configKey.key} (value: ${envValue}) to an integer.")
+            throw NumberFormatException("Could not parse environment variable ${configKey.key} (value: $envValue) to an integer.")
         }
     }
 }

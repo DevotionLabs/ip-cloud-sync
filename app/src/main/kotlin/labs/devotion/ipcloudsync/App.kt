@@ -15,5 +15,18 @@ fun main() {
     Logger.info("Scheduled IP sync frequency: $frequencyMins minutes")
 
     val ipSyncer = IpSyncer(frequencyMins.toLong())
+
+    Runtime.getRuntime().addShutdownHook(
+        Thread {
+            Logger.info("Shutdown signal received. Stopping cron job...")
+            ipSyncer.stop()
+            Logger.info("Cron job stopped. Resources cleaned up.")
+            Thread.currentThread().interrupt()
+            // TODO: Exit with code 0
+        }
+    )
+
     ipSyncer.start()
+
+    Logger.info("Application is running. Press Ctrl+C to exit.")
 }

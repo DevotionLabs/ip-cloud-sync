@@ -4,7 +4,7 @@ import labs.devotion.ipcloudsync.logger.Logger
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class IpSyncer(private val frequencyInMins: Long) {
+class IpSyncer(private val frequencyInMins: Int) {
 
     private val scheduler = Executors.newScheduledThreadPool(1)
 
@@ -19,7 +19,7 @@ class IpSyncer(private val frequencyInMins: Long) {
     }
 
     private fun scheduleSyncTaskCron() {
-        scheduler.scheduleAtFixedRate(SyncTask, 0, frequencyInMins, TimeUnit.MINUTES)
+        scheduler.scheduleAtFixedRate(SyncTask, 0, frequencyInMins.toLong(), TimeUnit.MINUTES)
     }
 
     fun stop() {

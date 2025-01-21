@@ -4,20 +4,20 @@ import labs.devotion.ipcloudsync.config.Config
 import labs.devotion.ipcloudsync.config.ConfigKeys
 import labs.devotion.ipcloudsync.ipsyncer.IpSyncer
 import labs.devotion.ipcloudsync.logger.Logger
-import sun.misc.Signal
 import kotlin.system.exitProcess
 
 object App {
-    private lateinit var ipSyncer: IpSyncer
+    private val ipSyncer: IpSyncer by lazy {
+        val frequencyMins = Config.getIntEnv(ConfigKeys.CRON_FREQUENCY_MINS)
+        IpSyncer(frequencyMins)
+    }
 
     fun start() {
-        setupLogger()
+        Logger.applyEnvConfig()
         Logger.info("IP CloudSync application started")
 
         try {
-            initIpSyncer()
-
-            handleTerminationSignals()
+            handleShutdownSignals()
 
             ipSyncer.start()
             Logger.info("Application is running. Press Ctrl+C to exit.")
@@ -27,29 +27,11 @@ object App {
         }
     }
 
-    private fun setupLogger() {
-        val logLevel = Config.getEnv(ConfigKeys.LOG_LEVEL)
-        Logger.setLevel(logLevel)
-    }
+    private fun handleShutdownSignals() {
+        val shutdownSignals = listOf("INT", "TERM", "QUIT")
 
-    private fun initIpSyncer() {
-        val frequencyMinsEnvValue = Config.getEnv(ConfigKeys.CRON_FREQUENCY_MINS)
-
-        // TODO: Extract this to another function
-        val frequencyMins = try {
-            frequencyMinsEnvValue.toLong()
-        } catch (e: NumberFormatException) {
-            ConfigKeys.CRON_FREQUENCY_MINS.defaultValue?.toLongOrNull()
-                ?: throw NumberFormatException("Default frequency value must be a number")
-        }
-
-        ipSyncer = IpSyncer(frequencyMins)
-    }
-
-    private fun handleTerminationSignals() {
-        val terminationSignals = listOf("INT", "TERM")
-        terminationSignals.forEach { signal ->
-            Signal.handle(Signal(signal)) { shutdown() }
+        SignalHandler.register(shutdownSignals) {
+            shutdown()
         }
     }
 

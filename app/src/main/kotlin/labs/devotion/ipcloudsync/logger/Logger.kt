@@ -1,15 +1,16 @@
 package labs.devotion.ipcloudsync.logger
 
+import labs.devotion.ipcloudsync.config.Config
+import labs.devotion.ipcloudsync.config.ConfigKeys
 import java.time.LocalDateTime
 
 object Logger {
     private var currentLevel: LogLevel = LogLevel.INFO
 
-    fun setLevel(userLevel: String) {
-        this.currentLevel = LogLevel.fromString(userLevel)
+    fun applyEnvConfig() {
+        val logLevelValue = Config.getEnv(ConfigKeys.LOG_LEVEL)
+        this.currentLevel = LogLevel.fromString(logLevelValue)
     }
-
-    fun getLevel() = currentLevel
 
     fun debug(message: String) {
         log(message, LogLevel.DEBUG)

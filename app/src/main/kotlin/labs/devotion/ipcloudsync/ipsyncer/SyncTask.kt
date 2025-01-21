@@ -9,7 +9,7 @@ import labs.devotion.ipcloudsync.httpclient.HttpClient
 import labs.devotion.ipcloudsync.ipfetcher.IpFetcher
 import labs.devotion.ipcloudsync.logger.Logger
 
-object SyncTask : Runnable {
+internal object SyncTask : Runnable {
 
     private val ipFetcher by lazy {
         val ipFetchServerUrl = Config.getEnv(ConfigKeys.IP_FETCH_SERVER_URL)

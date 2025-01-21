@@ -37,7 +37,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("labs.devotion.ipcloudsync.AppKt")
+    mainClass.set("labs.devotion.ipcloudsync.MainKt")
 }
 
 kotlin {
